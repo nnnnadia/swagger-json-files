@@ -1,0 +1,210 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Integração de Encaminhamentos para o ServiceNow",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://alicedev.service-now.com/api/sn_customerservice/duquesa_client_forwarding_base",
+      "description": "Ambiente de desenvolvimento"
+    },
+    {
+      "url": "https://aliceteste.service-now.com/api/sn_customerservice/duquesa_client_forwarding_base",
+      "description": "Ambiente de teste"
+    },
+    {
+      "url": "https://alicesaude.service-now.com/api/sn_customerservice/duquesa_client_forwarding_base",
+      "description": "Ambiente de produção"
+    }
+  ],
+  "tags": [
+    {
+      "name": "create",
+      "description": "Acesso à criação de registros de encaminhamento no ServiceNow"
+    }
+  ],
+  "paths": {
+    "/create": {
+      "post": {
+        "tags": [
+          "create"
+        ],
+        "summary": "Criar novos registros",
+        "description": "Criar novos registros na tabela de encaminhamentos do ServiceNow.",
+        "operationId": "createForwardings",
+        "security": [
+          {
+            "BasicAuth": []
+          }
+        ],
+        "requestBody": {
+          "description": "Lista de objetos com os dados do encaminhamento.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ArrayOfToBeRegisteredForwardings"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Operação ocorreu com sucesso; Será registrado os encaminhamentos com todos os campos corretos, mesmo que sejam encontrados objetos com problemas; Na resposta é possível conferir o que foi e o que não foi registrado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArrayOfForwardingsResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ArrayOfToBeRegisteredForwardings": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "national_id": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "specialty": {
+              "type": "string"
+            },
+            "referral_start_date": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "referral_end_date": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        },
+        "example": [
+          {
+            "national_id": "00003233",
+            "name": "HG Wells",
+            "specialty": "Geriatra",
+            "referral_start_date": "2023-05-25T17:02:51.248Z",
+            "referral_end_date": "2023-05-25T17:02:57.800Z"
+          },
+          {
+            "national_id": "00003823",
+            "name": "Dias Gomes",
+            "specialty": "Pediatra",
+            "referral_start_date": "2023-05-25T17:02:51.248Z",
+            "referral_end_date": "2023-05-25T17:02:57.800Z"
+          }
+        ]
+      },
+      "ArrayOfForwardingsResult": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "result": {
+              "type": "object",
+              "properties": {
+                "response": {
+                  "type": "object",
+                  "properties": {
+                    "successfulForwardings": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "national_id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "specialty": {
+                            "type": "string"
+                          },
+                          "referral_start_date": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "referral_end_date": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        }
+                      },
+                      "example": [
+                        {
+                          "national_id": "00003233",
+                          "name": "HG Wells",
+                          "specialty": "Geriatra",
+                          "referral_start_date": "2023-05-25T17:02:51.248Z",
+                          "referral_end_date": "2023-05-25T17:02:57.800Z"
+                        },
+                        {
+                          "national_id": "00003823",
+                          "name": "Dias Gomes",
+                          "specialty": "Pediatra",
+                          "referral_start_date": "2023-05-25T17:02:51.248Z",
+                          "referral_end_date": "2023-05-25T17:02:57.800Z"
+                        }
+                      ]
+                    },
+                    "faultyForwardings": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "national_id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "specialty": {
+                            "type": "string"
+                          },
+                          "referral_start_date": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "faultyProperty": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "example": [
+                        {
+                          "national_id": "00004733",
+                          "name": "Julio Verne",
+                          "specialty": "Cardiologista",
+                          "referral_start_date": "2023-05-25T17:02:51.248Z",
+                          "faultyProperty": "Forwarding object is missing some properties"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "BasicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    }
+  }
+}
